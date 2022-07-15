@@ -1,0 +1,44 @@
+inventory:
+  - devices:
+      platformtypes:
+      - "IMCM4"
+      - "IMCM5"
+      - "IMCRack"
+      pollfrequency: 1440
+    apis:
+    - name: CustomConfigStorageDiskGroup
+      type: "http"
+      address: "redfish"
+      projection: "Links.Oem.Cisco.Spans"
+      resource: "/redfish/v1/Systems/FCH22207BKF/Storage/SBMezz1/Volumes/0" 
+      toleratefailure: true
+
+    - name: dgDn
+      type: "http"
+      address: "redfish"
+      resource: {{$links}}
+      sourceapi: CustomConfigStorageDiskGroup
+      toleratefailure: true
+
+    objects:
+    - name: storage.DiskGroup
+      deviceselectors:
+      - "claimedredfish"
+      - "unclaimedredfish"
+      properties: 
+      - name: links
+        api: CustomConfigStorageDiskGroup
+        extract:
+          path: 'Links.Oem.Cisco.Spans.DrivesList."@odata.id"'
+          regex: (/redfish/v1/Systems/\w+/Storage/\w+/Drives/.*)
+      - name: SpanId
+        api: CustomConfigStorageDiskGroup
+        extract:
+          path: 'Links.Oem.Cisco.Spans."SpanId"'
+      - name: dhspLinks
+        api: CustomConfigStorageDiskGroup
+        extract:
+          path: 'Links.DedicatedSpareDrives'
+
+
+
