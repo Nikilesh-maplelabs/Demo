@@ -1,0 +1,89 @@
+# /redfish/v1/Systems/WZP24470RFP/Storage/MSTOR-RAID/Volumes
+inventory:
+  - devices:
+      platformtypes:
+      - "IMCM4"
+      - "IMCM5"
+      - "IMCRack"
+      pollfrequency: 1440
+
+    apis:
+
+    - name: RedfishSystems
+      type: "http"
+      address: "redfish"
+      projection: "Members"
+      resource: "/redfish/v1/Systems" 
+      toleratefailure: true
+
+    - name: RedfishSystemsID
+      type: "http"
+      address: "redfish"
+      resource:  {{$Memberapi}}
+      sourceapi: RedfishSystems
+      toleratefailure: true
+
+    - name: Storage
+      type: "http"
+      address: "redfish"
+      projection: "Members"
+      resource:  {{$Stock}}
+      sourceapi: RedfishSystemsID
+      toleratefailure: true
+
+    - name: StorageID
+      type: "http"
+      address: "redfish"
+      resource:  {{$StorageSerial}}
+      sourceapi: Storage
+      toleratefailure: true
+    
+    - name: Volume
+      type: "http"
+      address: "redfish"
+      projection: "Members"
+      resource: {{$VolumeUrl}}
+      sourceapi: StorageID
+      toleratefailure: true
+
+    - name: VolumeSerial
+      type: "http"
+      address: "redfish"
+      resource: {{$VolumeID}}
+      sourceapi: Volume
+      toleratefailure: true
+
+    objects:
+
+    - name: DiskGroup
+      deviceselectors:
+      - "claimedredfish"
+      - "unclaimedredfish"
+
+      properties:
+      - name: Memberapi  
+        api: RedfishSystems
+        extract:
+          path: '"@odata.id"'
+      - name: Stock
+        api: RedfishSystemsID
+        extract:
+          path: 'Storage."@odata.id"'
+      - name: StorageSerial
+        api: Storage
+        extract:
+          path: '"@odata.id"'
+          regex: (/redfish/v1/Systems/\w+/Storage/\w+)
+      - name: VolumeUrl
+        api: StorageID
+        extract:
+          path: 'Volumes."@odata.id"'
+      - name: VolumeID
+        api: Volume
+        extract: 
+          path: '"@odata.id"'
+
+
+        
+
+
