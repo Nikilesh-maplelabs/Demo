@@ -1,0 +1,38 @@
+inventory:
+  - devices:
+      platformtypes:
+      - "IMCM4"
+      - "IMCM5"
+      - "IMCRack"
+      pollfrequency: 1440
+    apis:
+    - name: redfishMemorys  
+      type: "http"
+      address: "redfish"
+      projection: "Members"
+      resource: "{{$MemorysResource}}"
+      sourceapi: redfishSystemDetail
+      toleratefailure: true
+    objects:
+    - name: blocksize.bytes
+      deviceselectors:
+      - "claimedredfish"
+      - "unclaimedredfish"
+      properties:
+      - name: MemberResource  
+        buildonly: true 
+        api: redfishSystemDetail
+        extract:
+          path: "BlockSizeBytes"
+    
+    - name: encrypt
+      deviceselectors:
+      - "claimedredfish"
+      - "unclaimedredfish"
+      properties:
+      - name: MemberResource  
+        buildonly: true 
+        api: redfishSystemDetail
+        extract:
+          path: "Encrypted"
+          
